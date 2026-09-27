@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MASTER ALUMINIUM</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a; --panel:#111a2e; --panel2:#0d1425; --border:#1c2740;
+  --text:#eef1f8; --muted:#8b93a7; --accent:#3b82f6; --teal:#2dd4bf;
+  --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --gold:#f0b429;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Tajawal',system-ui,sans-serif;
+  min-height:100%; display:flex; flex-direction:column;
+}
+header{
+  position:sticky; top:0; z-index:20; background:var(--bg);
+  padding:calc(10px + env(safe-area-inset-top,0px)) 16px 12px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.5px}
+.avatar{width:34px;height:34px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900}
+main{flex:1; padding:16px 16px 100px; max-width:640px; margin:0 auto; width:100%}
+h1{font-size:22px; margin:6px 0 2px; font-weight:900}
+.sub{color:var(--muted); font-size:13px; margin:0 0 16px}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:16px;
+  padding:16px; display:flex; flex-direction:column; gap:10px; min-height:118px;
+}
+.card .ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;align-self:flex-end}
+.card .lbl{color:var(--muted); font-size:13px}
+.card .val{font-size:20px; font-weight:900}
+.actions{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px}
+.actions .a{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; font-size:12px; cursor:pointer}
+.actions .a .ic{width:34px;height:34px;border-radius:10px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+section.view{display:none}
+section.view.active{display:block}
+.rowbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px}
+.btn{background:var(--accent); color:#fff; border:none; border-radius:12px; padding:10px 16px; font-family:inherit; font-weight:700; font-size:14px; cursor:pointer}
+.btn.secondary{background:#1c2740}
+.btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--border)}
+.search{display:flex; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:14px; gap:8px; color:var(--muted)}
+.search input{flex:1; background:transparent; border:none; color:var(--text); font-family:inherit; font-size:14px; outline:none}
+.item{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px}
+.item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+.item .name{font-weight:900; font-size:16px}
+.item .code{color:var(--muted); font-size:12px; margin-top:2px}
+.tag{display:inline-block; background:#1c2740; border-radius:8px; padding:3px 8px; font-size:11px; color:var(--muted); margin-top:4px}
+.icons{display:flex; gap:14px; color:var(--muted); font-size:16px}
+.icons span{cursor:pointer}
+.specs{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px; text-align:center}
+.specs .k{color:var(--muted); font-size:12px}
+.specs .v{font-weight:700; font-size:15px; margin-top:2px}
+.qty{display:flex; align-items:center; justify-content:center; gap:8px}
+.qty button{width:26px;height:26px;border-radius:8px;border:1px solid var(--border);background:#1c2740;color:var(--text);font-size:14px;cursor:pointer}
+.prices{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+.prices .box{background:var(--panel2); border-radius:12px; padding:10px; text-align:center}
+.prices .box .k{color:var(--muted); font-size:12px}
+.prices .box .v{font-weight:800; font-size:15px; margin-top:2px}
+.v.blue{color:#60a5fa} .v.green{color:var(--green)}
+.unavailable{color:var(--red); font-size:13px; background:rgba(239,68,68,.12); border-radius:10px; padding:8px 10px; margin-top:10px; text-align:center}
+.empty{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:40px 16px; text-align:center; color:var(--muted)}
+.empty .btn{margin-top:16px}
+.field{margin-bottom:14px}
+.field label{display:block; color:var(--muted); font-size:13px; margin-bottom:6px}
+.field input, .field select, .field textarea{
+  width:100%; background:var(--panel2); border:1px solid var(--border); border-radius:12px;
+  padding:12px 14px; color:var(--text); font-family:inherit; font-size:14px; outline:none;
+}
+.field textarea{min-height:70px; resize:vertical}
+.lenRow{display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:center}
+.lenRow input{width:100%; background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:11px 12px; color:var(--text); font-family:inherit; font-size:14px; outline:none}
+.lenRow .rm{background:#3a0f0f; color:var(--red); border:none; border-radius:10px; width:38px; height:38px; font-size:16px; cursor:pointer}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50; display:none; align-items:flex-end; justify-content:center}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--panel); width:100%; max-width:640px; max-height:88vh; overflow-y:auto;
+  border-radius:20px 20px 0 0; padding:20px; padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));
+}
+.modal .mtitle{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px}
+.modal .mtitle h2{font-size:18px; margin:0}
+.close{background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer}
+.modal-actions{display:flex; gap:10px; margin-top:6px}
+.modal-actions .btn{flex:1}
+nav.bottom{
+  position:fixed; bottom:0; right:0; left:0; z-index:30; background:var(--bg);
+  border-top:1px solid var(--border); display:flex; padding:10px 6px calc(8px + env(safe-area-inset-bottom,0px));
+}
+nav.bottom .n{flex:1; text-align:center; color:var(--muted); font-size:11px; cursor:pointer; padding:4px}
+nav.bottom .n .ic{font-size:20px; display:block; margin-bottom:2px}
+nav.bottom .n.active{color:var(--accent)}
+.chip{display:inline-flex; align-items:center; gap:4px; background:var(--panel); border:1px solid var(--border); border-radius:999px; padding:6px 12px; font-size:12px; color:var(--gold)}
+.moreItem{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:10px; cursor:pointer}
+.moreItem .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.total{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; font-weight:800; margin-top:4px}
+.total .v{color:var(--gold); font-size:18px}
+.serieBtn{cursor:pointer}
+.serieBtn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+.switch{position:relative; display:inline-block; width:44px; height:26px}
+.switch input{opacity:0; width:0; height:0}
+.switch .slider{position:absolute; cursor:pointer; inset:0; background:#1c2740; border-radius:999px; transition:.2s}
+.switch .slider:before{content:""; position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#8b93a7; border-radius:50%; transition:.2s}
+.switch input:checked + .slider{background:var(--accent)}
+.switch input:checked + .slider:before{transform:translateX(-18px); background:#fff}
+.itemRow{display:flex; justify-content:space-between; align-items:center; background:var(--panel2); border-radius:10px; padding:10px 12px; margin-bottom:8px}
+.itemRow .rm2{background:none; border:none; color:var(--red); font-size:16px; cursor:pointer}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="data:image/jpeg;base64,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" alt="Master Aluminum" style="height:34px;width:34px;border-radius:10px;object-fit:cover">
+  <div class="brand"><span>MASTER ALUMINIUM</span><div class="avatar"><img src="data:image/jpeg;base64,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" alt="M" style="width:100%;height:100%;border-radius:10px;object-fit:cover"></div></div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <h1>لوحة التحكم</h1>
+    <p class="sub">نظرة عامة على الورشة والمخزون</p>
+    <div class="grid" id="statsGrid"></div>
+    <div class="actions">
+      <div class="a" onclick="go('more')"><div class="ic" style="background:#1c2740">💼</div>الأعمال</div>
+      <div class="a" onclick="go('more')"><div class="ic" style="background:#3a2a0f;color:var(--gold)">💲</div>الأسعار</div>
+      <div class="a" onclick="go('stock')"><div class="ic" style="background:#0f3a2a;color:var(--teal)">📦</div>المخزون</div>
+      <div class="a" onclick="openJobModal()"><div class="ic" style="background:#122a4a;color:var(--accent)">➕</div>عمل جديد</div>
+    </div>
+    <h1 style="margin-top:26px">مواد يجب شراؤها</h1>
+    <div id="buyList"></div>
+  </section>
+
+  <!-- STOCK -->
+  <section class="view" id="view-stock">
+    <div class="rowbar">
+      <button class="btn" onclick="openMaterialModal()">+ إضافة</button>
+      <div>
+        <h1 style="margin:0">المخزون</h1>
+        <p class="sub" style="margin:0">بروفيلات الألمنيوم</p>
+      </div>
+    </div>
+    <div class="search"><span>🔍</span><input placeholder="بحث..." oninput="renderStock(this.value)"></div>
+    <div id="stockList"></div>
+  </section>
+
+  <!-- FORMULAS -->
+  <section class="view" id="view-formulas">
+    <div class="rowbar">
+      <button class="btn" onclick="openFormulaModal()">+ إضافة</button>
+      <div>
+        <h1 style="margin:0">Formulas / الوصفات</h1>
+        <p class="sub" style="margin:0">طريقة حساب كل نوع عمل</p>
+      </div>
+    </div>
+    <div id="formulaList"></div>
+  </section>
+
+  <!-- JOB CREATE -->
+  <section class="view" id="view-job">
+    <h1>عمل جديد</h1>
+    <p class="sub">إنشاء عمل مع حساب القص والتكلفة</p>
+    <div class="item">
+      <div class="field"><label>اسم العمل *</label><input id="jobName" placeholder="مثال: باب..."></div>
+      <div class="row2">
+        <div class="field"><label>الحريف</label><select id="jobClient"><option>بدون</option></select></div>
+        <div class="field"><label>التاريخ</label><input id="jobDate" type="date"></div>
+      </div>
+      <div class="field"><label>ملاحظات</label><input id="jobNotes"></div>
+    </div>
+    <div class="item">
+      <div class="rowbar" style="margin-bottom:0">
+        <button class="btn" onclick="alert('اختر مادة من المخزون أولاً')">+ إضافة</button>
+        <div style="font-weight:800">عناصر العمل</div>
+      </div>
+      <p class="sub" style="text-align:center; margin-top:14px">اضغط "إضافة" للبدء</p>
+    </div>
+    <button class="btn" style="width:100%; margin-top:10px" onclick="saveJob()">حفظ العمل</button>
+  </section>
+
+  <!-- MORE -->
+  <section class="view" id="view-more">
+    <h1>المزيد</h1>
+    <p class="sub">الإكسسوارات، الحرفاء، الأعمال، Devis والإعدادات</p>
+    <div class="moreItem" onclick="go('prices')"><span>الأسعار والتكاليف</span><div class="ic" style="background:#0f3a2a;color:var(--teal)">💲</div></div>
+    <div class="moreItem" onclick="go('accessories')"><span>الإكسسوارات</span><div class="ic" style="background:#0f3a2a;color:var(--teal)">🔧</div></div>
+    <div class="moreItem" onclick="go('clients')"><span>الحرفاء</span><div class="ic" style="background:#3a2a0f;color:var(--gold)">👥</div></div>
+    <div class="moreItem" onclick="go('jobsList')"><span>الأعمال</span><div class="ic" style="background:#122a4a;color:var(--accent)">📄</div></div>
+    <div class="moreItem" onclick="go('devisList')"><span>Devis — عروض الأسعار</span><div class="ic" style="background:#3a0f2a;color:#f472b6">📄</div></div>
+    <div class="moreItem" onclick="go('search')"><span>البحث</span><div class="ic" style="background:#1c2740">🔍</div></div>
+    <div class="moreItem" onclick="go('settings')"><span>الإعدادات</span><div class="ic" style="background:#1c2740">⚙️</div></div>
+  </section>
+
+  <!-- JOBS LIST -->
+  <section class="view" id="view-jobsList">
+    <h1>الأعمال</h1>
+    <p class="sub">جميع الأعمال المسجلة</p>
+    <div id="jobsListDiv"></div>
+  </section>
+
+  <!-- PRICES -->
+  <section class="view" id="view-prices">
+    <h1>الأسعار والتكاليف</h1>
+    <p class="sub">إدارة أسعار المواد والتكاليف</p>
+    <div class="grid" id="pricesStats" style="grid-template-columns:1fr 1fr 1fr; margin-bottom:16px"></div>
+    <div class="search"><span>🔍</span><input placeholder="بحث بالكود أو الاسم..." oninput="renderPrices(this.value)"></div>
+    <div class="actions" style="grid-template-columns:repeat(3,1fr); margin-bottom:14px">
+      <div class="a serieBtn active" data-serie="all" onclick="setSerieFilter('all')">الكل</div>
+      <div class="a serieBtn" data-serie="40" onclick="setSerieFilter('40')">Série 40</div>
+      <div class="a serieBtn" data-serie="67" onclick="setSerieFilter('67')">Série 67</div>
+    </div>
+    <div id="pricesList"></div>
+  </section>
+
+  <!-- ACCESSORIES -->
+  <section class="view" id="view-accessories">
+    <div class="rowbar">
+      <button class="btn" onclick="openAccessoryModal()">+ إضافة</button>
+      <div><h1 style="margin:0">الإكسسوارات</h1><p class="sub" style="margin:0">poignée, serrure, roulette...</p></div>
+    </div>
+    <div class="search"><span>🔍</span><input placeholder="بحث..." oninput="renderAccessories(this.value)"></div>
+    <div id="accessoriesList"></div>
+  </section>
+
+  <!-- CLIENTS -->
+  <section class="view" id="view-clients">
+    <div class="rowbar">
+      <button class="btn" onclick="openClientModal()">+ إضافة</button>
+      <div><h1 style="margin:0">الحرفاء</h1><p class="sub" style="margin:0">إدارة بيانات الحرفاء</p></div>
+    </div>
+    <div class="search"><span>🔍</span><input placeholder="بحث..." oninput="renderClients(this.value)"></div>
+    <div id="clientsList"></div>
+  </section>
+
+  <!-- DEVIS LIST -->
+  <section class="view" id="view-devisList">
+    <div class="rowbar">
+      <button class="btn" onclick="openDevisModal()">+ Devis</button>
+      <div><h1 style="margin:0">Devis</h1><p class="sub" style="margin:0">عروض الأسعار</p></div>
+    </div>
+    <div id="devisListDiv"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="view" id="view-search">
+    <h1>البحث</h1>
+    <p class="sub">ابحث في المواد، الحرفاء والأعمال</p>
+    <div class="search"><span>🔍</span><input id="globalSearchInput" placeholder="اكتب للبحث..." oninput="renderGlobalSearch(this.value)"></div>
+    <div id="globalSearchResults"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings">
+    <h1>الإعدادات</h1>
+    <p class="sub">إعدادات التطبيق والأمان</p>
+    <div class="item">
+      <div class="top"><div class="name">رمز PIN</div><label class="switch"><input type="checkbox" id="pinToggle" onchange="state.settings.pin=this.checked; save();"><span class="slider"></span></label></div>
+      <p class="sub" style="margin:8px 0 0">معطّل — لا يوجد رمز حماية</p>
+    </div>
+    <div class="item">
+      <div class="name" style="margin-bottom:10px">البيانات والمزامنة</div>
+      <p class="sub" style="margin:4px 0">التخزين المحلي: <span style="color:var(--green)">مفعّل</span></p>
+      <p class="sub" style="margin:4px 0">يتم حفظ بياناتك في هذا المتصفح فقط</p>
+      <button class="btn secondary" style="width:100%; margin-top:10px" onclick="if(confirm('هل تريد مسح جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.')){localStorage.removeItem(LS_KEY); location.reload();}">مسح جميع البيانات</button>
+    </div>
+    <div class="item">
+      <div class="name" style="margin-bottom:10px">معلومات التطبيق</div>
+      <p class="sub" style="margin:4px 0">الاسم: MASTER ALUMINIUM</p>
+      <p class="sub" style="margin:4px 0">الإصدار: 1.0.0</p>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottom">
+  <div class="n" data-v="more" onclick="go('more')"><span class="ic">☰</span>المزيد</div>
+  <div class="n" data-v="formulas" onclick="go('formulas')"><span class="ic">📖</span>الوصفات</div>
+  <div class="n" data-v="job" onclick="openJobModal()"><span class="ic">➕</span>عمل</div>
+  <div class="n" data-v="stock" onclick="go('stock')"><span class="ic">📦</span>المخزون</div>
+  <div class="n active" data-v="home" onclick="go('home')"><span class="ic">🏠</span>الرئيسية</div>
+</nav>
+
+<!-- MATERIAL MODAL -->
+<div class="modal-bg" id="materialModalBg">
+  <div class="modal">
+    <div class="mtitle"><button class="close" onclick="closeModal('materialModalBg')">✕</button><h2 id="materialModalTitle">إضافة مادة</h2></div>
+    <div class="field"><label>اسم المادة *</label><input id="mName" placeholder="Profil 40x20"></div>
+    <div class="row2">
+      <div class="field"><label>النوع</label><input id="mType" placeholder="Profil"></div>
+      <div class="field"><label>Code</label><input id="mCode" placeholder="P4020"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>اللون</label><input id="mColor" placeholder="أبيض"></div>
+      <div class="field"><label>الوحدة</label><input id="mUnit" value="قضيب"></div>
+    </div>
+    <div class="field">
+      <label>الأطوال والكميات (يمكن إضافة أكثر من طول لنفس المادة)</label>
+      <div id="lengthRows"></div>
+      <button type="button" class="btn ghost" style="width:100%; margin-top:6px" onclick="addLengthRow()">+ إضافة طول آخر</button>
+    </div>
+    <div class="row2">
+      <div class="field"><label>سعر الشراء (د.ت)</label><input id="mBuy" type="number" value="0"></div>
+      <div class="field"><label>سعر القضيب (د.ت)</label><input id="mBar" type="number" value="0"></div>
+    </div>
+    <div class="field"><label>السلسلة (Série)</label><input id="mSerie" placeholder="Série 40 / Série 67"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal('materialModalBg')">إلغاء</button>
+      <button class="btn" id="materialSaveBtn" onclick="saveMaterial()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULA MODAL -->
+<div class="modal-bg" id="formulaModalBg">
+  <div class="modal">
+    <div class="mtitle"><button class="close" onclick="closeModal('formulaModalBg')">✕</button><h2>إضافة وصفة</h2></div>
+    <div class="field"><label>اسم الوصفة *</label><input id="fName" placeholder="Coulissant / نافذة / باب"></div>
+    <div class="field"><label>نوع العمل</label><input id="fType" placeholder="باب، نافذة..."></div>
+    <div class="field"><label>الوصف</label><textarea id="fDesc"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal('formulaModalBg')">إلغاء</button>
+      <button class="btn" onclick="saveFormula()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACCESSORY MODAL -->
+<div class="modal-bg" id="accessoryModalBg">
+  <div class="modal">
+    <div class="mtitle"><button class="close" onclick="closeModal('accessoryModalBg')">✕</button><h2 id="accessoryModalTitle">إضافة إكسسوار</h2></div>
+    <div class="field"><label>الاسم *</label><input id="acName" placeholder="poignée"></div>
+    <div class="row2">
+      <div class="field"><label>الوحدة</label><input id="acUnit" value="قطعة"></div>
+      <div class="field"><label>Code</label><input id="acCode" placeholder="P01"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>السعر (د.ت)</label><input id="acPrice" type="number" value="0"></div>
+      <div class="field"><label>الكمية</label><input id="acQty" type="number" value="0"></div>
+    </div>
+    <div class="field"><label>سعر الشراء (د.ت)</label><input id="acBuy" type="number" value="0"></div>
+    <div class="field"><label>الحد الأدنى</label><input id="acMin" type="number" value="0"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal('accessoryModalBg')">إلغاء</button>
+      <button class="btn" id="accessorySaveBtn" onclick="saveAccessory()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT MODAL -->
+<div class="modal-bg" id="clientModalBg">
+  <div class="modal">
+    <div class="mtitle"><button class="close" onclick="closeModal('clientModalBg')">✕</button><h2 id="clientModalTitle">إضافة حريف</h2></div>
+    <div class="field"><label>الاسم *</label><input id="clName"></div>
+    <div class="field"><label>الهاتف</label><input id="clPhone"></div>
+    <div class="field"><label>العنوان</label><input id="clAddress"></div>
+    <div class="field"><label>ملاحظات</label><textarea id="clNotes"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal('clientModalBg')">إلغاء</button>
+      <button class="btn" id="clientSaveBtn" onclick="saveClient()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEVIS MODAL -->
+<div class="modal-bg" id="devisModalBg">
+  <div class="modal">
+    <div class="mtitle"><button class="close" onclick="closeModal('devisModalBg')">✕</button><h2>إنشاء Devis</h2></div>
+    <div class="field"><label>من عمل موجود</label>
+      <select id="devJob" onchange="onDevJobChange()"><option value="">بدون</option></select>
+    </div>
+    <div class="field"><label>الحريف</label>
+      <select id="devClient"><option value="">بدون</option></select>
+    </div>
+    <div class="field">
+      <label>تفاصيل العمل</label>
+      <div id="devLines"></div>
+      <button type="button" class="btn ghost" style="width:100%; margin-top:6px" onclick="addDevLine()">+ إضافة سطر</button>
+    </div>
+    <div class="field"><label>أجرة اليد العاملة (د.ت)</label><input id="devLabor" type="number" value="0" oninput="updateDevTotals()"></div>
+    <div class="item">
+      <div class="rowbar" style="margin-bottom:6px"><span>المجموع الفرعي</span><span id="devSubtotal">0.00 د.ت</span></div>
+      <div class="rowbar" style="margin-bottom:6px"><span>اليد العاملة</span><span id="devLaborShow">0.00 د.ت</span></div>
+      <div class="rowbar" style="margin-bottom:0; font-weight:800"><span>المجموع النهائي</span><span id="devTotal" style="color:var(--gold)">0.00 د.ت</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal('devisModalBg')">إلغاء</button>
+      <button class="btn" onclick="saveDevis()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LS_KEY='master_alu_data_v2';
+const SEED_MATERIALS = [
+["40112","40112","Profil",600,0.172,97.83,"قضيب"],
+["40402","T40402L","Profil",600,0,115.34,"قضيب"],
+["Axe octogonal 40","E40","Profil",600,0,16.80,"قضيب"],
+["Axe octogonal 60 galvanisé 6.00","AXE60","Profil",600,0.3,26.32,"قضيب"],
+["Barre moustiquaire fenêtre LB H1.8 Italy 5.80m","","Profil",580,0,290.70,"قضيب"],
+["Bouchon lame 55","BL55","Accessoire",0,70,0.05,"قطعة"],
+["Bouchon pour battement central S40","B40112L","Accessoire",600,0,0.52,"قطعة"],
+["Console monobloc 15.5 arrondie","CON16A","Accessoire",600,0,26.40,"قطعة"],
+["Crémone Master blanc","C90MB","Accessoire",600,0,17.84,"قطعة"],
+["Dormant 2 rails avec C.J arrondie blanc","","Profil",600,0,117.16,"قضيب"],
+["Dormant 2 rails sans C.J blanc (OX67)","","Profil",600,0,100.55,"قضيب"],
+["Dormant Z laqué blanc","T4010L","Profil",600,0,110.77,"قضيب"],
+["Équerre dormant coulisse 0472.9","","Accessoire",600,0,0,"قطعة"],
+["Équerre ZAMAC série 40 TPR","4003F","Accessoire",600,0,1.59,"قطعة"],
+["Fermeture Alpha G.M Blanc","","Accessoire",600,0,15.05,"قطعة"],
+["Gâche fermeture rail ouvrant Laval","A0234LAVAL","Accessoire",600,0,0,"قطعة"],
+["Galet double","","Accessoire",600,0,2.21,"قطعة"],
+["Glissière double blanc KODAS","180GDK","Profil",600,0,63.85,"قضيب"],
+["Glissière lame 55 blanc","PR11060L","Profil",600,0,50.42,"قضيب"],
+["Glissière moustiquaire Italy","","Profil",600,0,80.85,"قضيب"],
+["Joint battement STC","J247F","Accessoire",600,0,0,"قطعة"],
+["Joint brosse 6mm","JB6","Accessoire",600,0,0.17,"قطعة"],
+["Joint de bourrage 52036 IMC","J52036IMC","Accessoire",600,0,0.64,"قطعة"],
+["Joint vitrage STC","J24F","Accessoire",600,0,0.46,"قطعة"],
+["Kit 67","","Accessoire",600,0,2.66,"قطعة"],
+["Kit blanc avec sangle","KIT_MON","Accessoire",600,0,20.91,"قطعة"],
+["Kit crémone Master","KITCM","Accessoire",600,0,6.64,"قطعة"],
+["Kit moustiquaire complet Italy","","Accessoire",600,0,17.90,"قطعة"],
+["Kit verrou semi-fixe Master","KVRSM","Accessoire",600,0,7.32,"قطعة"],
+["Lame 45 GM LB SPI","ALU45L6","Profil",600,0,14.62,"قضيب"],
+["Lame 55 (6m) blanc SPI","ALU55L6","Profil",600,0,19.28,"قضيب"],
+["Lame final GM blanc Palma","PA11049L","Profil",600,0,55.62,"قضيب"],
+["Monobloc 15.5 arrondie 6m","CK16A","Profil",600,0,184.80,"قضيب"],
+["Montant central ouvrant blanc","","Profil",600,0,65.02,"قضيب"],
+["Montant latéral ouvrant blanc","","Profil",600,0,82.95,"قضيب"],
+["Moteur 40kg store","MOT40ST","Accessoire",600,0,0,"قطعة"],
+["Rail rapporté noir (PA60120)","","Profil",600,0,26.18,"قضيب"],
+["Réducteur blanc","","Accessoire",600,0,18.38,"قطعة"],
+["Telesco axe 60","TELESCO60","Accessoire",600,0,0,"قطعة"],
+["Tirante grand modèle","MEC52","Accessoire",600,0,2.02,"قطعة"],
+["Traverse haute et base (OX 6711)","PE67106L","Profil",600,0,79.89,"قضيب"],
+["Parclose arrondie laqué blanc","T4016L","Profil",600,0,40.62,"قضيب"],
+["Paumelle à cale blanc","P_A_CALE","Accessoire",600,0,3.81,"قطعة"],
+["Profilé 40107 blanc KODAS","K40107B","Profil",600,0,0,"قضيب"]
+];
+function seedMaterials(){
+  return SEED_MATERIALS.map((r,i)=>({
+    id:'seed'+i, name:r[0], code:r[1], type:r[2], length:r[3], qty:r[4],
+    color:'', unit:r[6], buy:r[5], bar:r[5], serie:''
+  }));
+}
+let state = load();
+state.accessories = state.accessories || [];
+state.clients = state.clients || [];
+state.devis = state.devis || [];
+state.settings = state.settings || {pin:false};
+let serieFilter = 'all';
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { materials:seedMaterials(), formulas:[], jobs:[], accessories:[], clients:[], devis:[], settings:{pin:false} };
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function go(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('nav .n').forEach(el=>el.classList.remove('active'));
+  const nav = document.querySelector('nav .n[data-v="'+v+'"]');
+  if(nav) nav.classList.add('active');
+  if(v==='home') renderHome();
+  if(v==='stock') renderStock('');
+  if(v==='formulas') renderFormulas();
+  if(v==='jobsList') renderJobs();
+  if(v==='prices') renderPrices('');
+  if(v==='accessories') renderAccessories('');
+  if(v==='clients') renderClients('');
+  if(v==='devisList') renderDevisList();
+  if(v==='search'){ document.getElementById('globalSearchResults').innerHTML=''; }
+  if(v==='settings'){ document.getElementById('pinToggle').checked = !!state.settings.pin; }
+  window.scrollTo(0,0);
+}
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+let editingMaterialId = null;
+let lengthRowCount = 0;
+
+function addLengthRow(length, qty){
+  const id = 'len'+(lengthRowCount++);
+  const div = document.createElement('div');
+  div.className = 'lenRow';
+  div.id = id;
+  div.innerHTML = `
+    <input type="number" placeholder="الطول (سم)" value="${length!==undefined?length:600}" data-role="length">
+    <input type="number" placeholder="الكمية" value="${qty!==undefined?qty:0}" data-role="qty">
+    <button type="button" class="rm" onclick="document.getElementById('${id}').remove()">✕</button>`;
+  document.getElementById('lengthRows').appendChild(div);
+}
+
+function clearMaterialForm(){
+  ['mName','mType','mCode','mColor','mSerie'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('mUnit').value = 'قضيب';
+  document.getElementById('mBuy').value = 0;
+  document.getElementById('mBar').value = 0;
+  document.getElementById('lengthRows').innerHTML = '';
+  addLengthRow(600, 0);
+}
+function openMaterialModal(){
+  editingMaterialId = null;
+  clearMaterialForm();
+  document.getElementById('materialModalTitle').textContent = 'إضافة مادة';
+  document.getElementById('materialSaveBtn').textContent = 'إضافة';
+  openModal('materialModalBg');
+}
+function editMaterial(id){
+  const m = state.materials.find(x=>x.id===id);
+  if(!m) return;
+  editingMaterialId = id;
+  document.getElementById('mName').value = m.name||'';
+  document.getElementById('mType').value = m.type||'';
+  document.getElementById('mCode').value = m.code||'';
+  document.getElementById('mColor').value = m.color||'';
+  document.getElementById('mUnit').value = m.unit||'';
+  document.getElementById('mBuy').value = m.buy||0;
+  document.getElementById('mBar').value = m.bar||0;
+  document.getElementById('mSerie').value = m.serie||'';
+  document.getElementById('lengthRows').innerHTML = '';
+  addLengthRow(m.length||0, m.qty||0);
+  document.getElementById('materialModalTitle').textContent = 'تعديل مادة';
+  document.getElementById('materialSaveBtn').textContent = 'حفظ';
+  openModal('materialModalBg');
+}
+function openFormulaModal(){ openModal('formulaModalBg'); }
+function openJobModal(){ go('job'); document.getElementById('jobDate').value = new Date().toISOString().slice(0,10); }
+
+function fmt(n){ return (Math.round(n*100)/100).toFixed(2); }
+
+function calcStock(){
+  let ht=0;
+  state.materials.forEach(m=>{ ht += (m.qty||0) * (m.bar||0); });
+  return { ht, ttc: ht*1.19 };
+}
+
+function renderHome(){
+  const s = calcStock();
+  const materialsCount = state.materials.length;
+  const jobsCount = state.jobs.length;
+  const unavailable = state.materials.filter(m=>(m.qty||0)<=0).length;
+  const lowStock = state.materials.filter(m=>(m.qty||0)>0 && (m.qty||0)<3).length;
+  const grid = document.getElementById('statsGrid');
+  grid.innerHTML = `
+    <div class="card"><div class="ic" style="background:#0f3a2a;color:var(--teal)">📦</div><div class="lbl">قيمة المخزون TTC</div><div class="val">${fmt(s.ttc)} د.ت</div></div>
+    <div class="card"><div class="ic" style="background:#122a4a;color:var(--accent)">📦</div><div class="lbl">قيمة المخزون HT</div><div class="val">${fmt(s.ht)} د.ت</div></div>
+    <div class="card"><div class="ic" style="background:#0f3a2a;color:var(--teal)">💼</div><div class="lbl">عدد الأعمال</div><div class="val">${jobsCount}</div></div>
+    <div class="card"><div class="ic" style="background:#1c2740">📦</div><div class="lbl">عدد المواد</div><div class="val">${materialsCount}</div></div>
+    <div class="card"><div class="ic" style="background:#3a0f0f;color:var(--red)">✕</div><div class="lbl">غير متوفرة</div><div class="val">${unavailable}</div></div>
+    <div class="card"><div class="ic" style="background:#3a2a0f;color:var(--amber)">⚠️</div><div class="lbl">مخزون منخفض</div><div class="val">${lowStock}</div></div>
+    <div class="card"><div class="ic" style="background:#0f3a2a;color:var(--green)">📈</div><div class="lbl">الأرباح</div><div class="val">0.00 د.ت</div></div>
+    <div class="card"><div class="ic" style="background:#3a2a0f;color:var(--gold)">$</div><div class="lbl">إجمالي المبيعات</div><div class="val">0.00 د.ت</div></div>
+  `;
+  const buy = state.materials.filter(m=>(m.qty||0)<=0);
+  const buyDiv = document.getElementById('buyList');
+  if(buy.length===0){
+    buyDiv.innerHTML = `<div class="empty">لا توجد مواد يجب شراؤها حاليًا</div>`;
+  } else {
+    let total=0;
+    buyDiv.innerHTML = buy.map(m=>{
+      total += m.bar*1.19||0;
+      return `<div class="item" style="padding:14px 16px">
+        <div class="top">
+          <div><div class="name">${esc(m.name)}</div><span class="tag">غير متوفر — شراء ${Math.max(1,Math.abs(m.qty||0)||1)} ${esc(m.unit||'قضيب')}</span></div>
+          <div style="color:var(--gold); font-weight:800">${fmt((m.bar||0)*1.19)} د.ت</div>
+        </div>
+      </div>`;
+    }).join('') + `<div class="total"><span>إجمالي تكلفة الشراء</span><span class="v">${fmt(total)} د.ت</span></div>`;
+  }
+}
+
+function esc(s){ return (s||'').toString().replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+
+function renderStock(filter){
+  const list = document.getElementById('stockList');
+  let items = state.materials;
+  if(filter) items = items.filter(m=>(m.name+m.code).toLowerCase().includes(filter.toLowerCase()));
+  if(items.length===0){
+    list.innerHTML = `<div class="empty">لا توجد مواد<br><button class="btn" onclick="openMaterialModal()">إضافة أول مادة</button></div>`;
+    return;
+  }
+  list.innerHTML = items.map(m=>{
+    const meterPrice = m.length ? (m.bar||0)/(m.length/100) : 0;
+    const stockVal = (m.qty||0) * (m.bar||0);
+    const unavailable = (m.qty||0)<=0;
+    return `<div class="item">
+      <div class="top">
+        <div class="icons"><span onclick="deleteMaterial('${m.id}')">🗑</span><span onclick="editMaterial('${m.id}')">✎</span></div>
+        <div style="text-align:left">
+          ${unavailable?'<span style="color:var(--red)">⊗</span> ':''}<span class="name">${esc(m.name)}</span>
+          <div class="code">Code: ${esc(m.code||'-')}</div>
+          <span class="tag">${esc(m.type||'Profil')}</span>
+        </div>
+      </div>
+      <div class="specs">
+        <div><div class="k">أمتار</div><div class="v">${fmt((m.length||0)/100)} م</div></div>
+        <div><div class="k">طول القضيب</div><div class="v">${fmt((m.length||0)/100)} م</div></div>
+        <div><div class="k">الكمية</div><div class="qty">
+          <button onclick="changeQty('${m.id}',1)">+</button><span>${m.qty||0}</span><button onclick="changeQty('${m.id}',-1)">−</button>
+        </div></div>
+      </div>
+      <div class="prices">
+        <div class="box"><div class="k">السعر الصافي TTC</div><div class="v blue">${fmt((m.bar||0)*1.19)} د.ت</div></div>
+        <div class="box"><div class="k">سعر القضيب HT</div><div class="v green">${fmt(m.bar||0)} د.ت</div></div>
+      </div>
+      <p class="sub" style="margin:8px 0 0">قيمة المخزون: <span style="color:var(--green)">${fmt(stockVal)} د.ت</span> — الحد الأدنى: 0</p>
+      ${unavailable?`<div class="unavailable">🛒 يجب شراء 1 ${esc(m.unit||'قضيب')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function changeQty(id,d){
+  const m = state.materials.find(x=>x.id===id);
+  if(m){ m.qty = (m.qty||0)+d; save(); renderStock(''); }
+}
+function deleteMaterial(id){
+  state.materials = state.materials.filter(m=>m.id!==id);
+  save(); renderStock('');
+}
+function saveMaterial(){
+  const name = document.getElementById('mName').value.trim();
+  if(!name){ alert('اسم المادة مطلوب'); return; }
+  const type = document.getElementById('mType').value;
+  const code = document.getElementById('mCode').value.trim();
+  const color = document.getElementById('mColor').value;
+  const unit = document.getElementById('mUnit').value.trim();
+  const buy = parseFloat(document.getElementById('mBuy').value)||0;
+  const bar = parseFloat(document.getElementById('mBar').value)||0;
+  const serie = document.getElementById('mSerie').value;
+  const rows = Array.from(document.querySelectorAll('#lengthRows .lenRow')).map(r=>({
+    length: parseFloat(r.querySelector('[data-role="length"]').value)||0,
+    qty: parseFloat(r.querySelector('[data-role="qty"]').value)||0
+  }));
+  if(rows.length===0){ alert('أضف طولاً واحدًا على الأقل'); return; }
+
+  if(editingMaterialId){
+    const m = state.materials.find(x=>x.id===editingMaterialId);
+    if(m){
+      m.name=name; m.type=type; m.code=code; m.color=color; m.unit=unit;
+      m.buy=buy; m.bar=bar; m.serie=serie;
+      m.length=rows[0].length; m.qty=rows[0].qty;
+    }
+    editingMaterialId = null;
+    save(); closeModal('materialModalBg'); clearMaterialForm();
+    go('stock');
+    return;
+  }
+
+  let mergedCount = 0, createdCount = 0;
+  rows.forEach(r=>{
+    const existing = state.materials.find(m =>
+      m.name.trim().toLowerCase() === name.toLowerCase() &&
+      (m.length||0) === r.length &&
+      (m.unit||'').trim().toLowerCase() === unit.toLowerCase()
+    );
+    if(existing){
+      existing.qty = (existing.qty||0) + r.qty;
+      mergedCount++;
+    } else {
+      state.materials.push({
+        id: 'm'+Date.now()+Math.random().toString(36).slice(2,7),
+        name, type, code, length:r.length, color, qty:r.qty, unit, buy, bar, serie
+      });
+      createdCount++;
+    }
+  });
+  save(); closeModal('materialModalBg'); clearMaterialForm();
+  go('stock');
+  if(mergedCount>0 && createdCount===0) alert('نفس المادة بنفس الطول موجودة — تم زيادة الكمية فقط');
+  else if(mergedCount>0) alert(`تمت إضافة ${createdCount} طول جديد وتحديث ${mergedCount} طول موجود`);
+}
+
+function renderFormulas(){
+  const list = document.getElementById('formulaList');
+  if(state.formulas.length===0){
+    list.innerHTML = `<div class="empty">لا توجد وصفات<br><button class="btn" onclick="openFormulaModal()">إنشاء أول وصفة</button></div>`;
+    return;
+  }
+  list.innerHTML = state.formulas.map(f=>`
+    <div class="item">
+      <div class="top">
+        <div class="icons"><span onclick="deleteFormula('${f.id}')">🗑</span></div>
+        <div style="text-align:left"><div class="name">${esc(f.name)}</div><span class="tag">${esc(f.type||'-')}</span></div>
+      </div>
+      ${f.desc?`<p class="sub" style="margin-top:10px">${esc(f.desc)}</p>`:''}
+    </div>`).join('');
+}
+function deleteFormula(id){ state.formulas = state.formulas.filter(f=>f.id!==id); save(); renderFormulas(); }
+function saveFormula(){
+  const name = document.getElementById('fName').value.trim();
+  if(!name){ alert('اسم الوصفة مطلوب'); return; }
+  state.formulas.push({ id:'f'+Date.now(), name, type:document.getElementById('fType').value, desc:document.getElementById('fDesc').value });
+  save(); closeModal('formulaModalBg');
+  ['fName','fType','fDesc'].forEach(i=>document.getElementById(i).value='');
+  go('formulas');
+}
+
+function saveJob(){
+  const name = document.getElementById('jobName').value.trim();
+  if(!name){ alert('اسم العمل مطلوب'); return; }
+  state.jobs.push({ id:'j'+Date.now(), name, date:document.getElementById('jobDate').value, notes:document.getElementById('jobNotes').value });
+  save();
+  document.getElementById('jobName').value=''; document.getElementById('jobNotes').value='';
+  go('home');
+}
+function renderJobs(){
+  const div = document.getElementById('jobsListDiv');
+  if(state.jobs.length===0){ div.innerHTML = `<div class="empty">لا توجد أعمال بعد</div>`; return; }
+  div.innerHTML = state.jobs.map(j=>`<div class="item"><div class="name">${esc(j.name)}</div><p class="sub">${esc(j.date||'')} ${j.notes?'— '+esc(j.notes):''}</p></div>`).join('');
+}
+
+// ===== PRICES =====
+function setSerieFilter(s){
+  serieFilter = s;
+  document.querySelectorAll('.serieBtn').forEach(b=>b.classList.toggle('active', b.dataset.serie===s));
+  renderPrices(document.querySelector('#view-prices .search input')?.value||'');
+}
+function renderPrices(filter){
+  let items = state.materials;
+  if(serieFilter!=='all') items = items.filter(m=>(m.serie||'').includes(serieFilter));
+  if(filter) items = items.filter(m=>(m.name+m.code).toLowerCase().includes(filter.toLowerCase()));
+  const avgDisc = 0;
+  const stockVal = items.reduce((s,m)=>s+(m.qty||0)*(m.bar||0),0);
+  document.getElementById('pricesStats').innerHTML = `
+    <div class="card"><div class="ic" style="background:#3a2a0f;color:var(--gold)">🏷</div><div class="lbl">متوسط التخفيض</div><div class="val">${fmt(avgDisc)}%</div></div>
+    <div class="card"><div class="ic" style="background:#0f3a2a;color:var(--green)">$</div><div class="lbl">قيمة المخزون</div><div class="val">${fmt(stockVal)} د.ت</div></div>
+    <div class="card"><div class="ic" style="background:#122a4a;color:var(--accent)">📦</div><div class="lbl">المواد</div><div class="val">${items.length}</div></div>`;
+  const list = document.getElementById('pricesList');
+  if(items.length===0){ list.innerHTML = `<div class="empty">لا توجد مواد</div>`; return; }
+  list.innerHTML = items.map(m=>{
+    const meterPrice = m.length ? (m.bar||0)/(m.length/100) : 0;
+    return `<div class="item">
+      <div class="top">
+        <div class="icons"><span onclick="deleteMaterial('${m.id}')">🗑</span><span onclick="editMaterial('${m.id}')">✎</span></div>
+        <div style="text-align:left">
+          <span class="tag">${esc(m.serie||'أخرى')}</span> <span class="name">${esc(m.code||m.name)}</span>
+          <div class="code">Code: ${esc(m.code||'-')}</div>
+        </div>
+      </div>
+      <div class="prices">
+        <div class="box"><div class="k">السعر الصافي TTC</div><div class="v blue">${fmt((m.bar||0)*1.19)} د.ت</div></div>
+        <div class="box"><div class="k">سعر الوحدة HT</div><div class="v green">${fmt(m.bar||0)} د.ت</div></div>
+      </div>
+      <div class="specs" style="grid-template-columns:1fr 1fr">
+        <div><div class="k">سعر المتر</div><div class="v">${fmt(meterPrice)} د.ت</div></div>
+        <div><div class="k">الكمية: ${m.qty||0} ${esc(m.unit||'قضيب')}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== ACCESSORIES =====
+let editingAccessoryId = null;
+function openAccessoryModal(){
+  editingAccessoryId = null;
+  ['acName','acCode'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('acUnit').value='قطعة';
+  document.getElementById('acPrice').value=0; document.getElementById('acQty').value=0;
+  document.getElementById('acBuy').value=0; document.getElementById('acMin').value=0;
+  document.getElementById('accessoryModalTitle').textContent='إضافة إكسسوار';
+  document.getElementById('accessorySaveBtn').textContent='إضافة';
+  openModal('accessoryModalBg');
+}
+function editAccessory(id){
+  const a = state.accessories.find(x=>x.id===id);
+  if(!a) return;
+  editingAccessoryId = id;
+  document.getElementById('acName').value=a.name||'';
+  document.getElementById('acCode').value=a.code||'';
+  document.getElementById('acUnit').value=a.unit||'قطعة';
+  document.getElementById('acPrice').value=a.price||0;
+  document.getElementById('acQty').value=a.qty||0;
+  document.getElementById('acBuy').value=a.buy||0;
+  document.getElementById('acMin').value=a.min||0;
+  document.getElementById('accessoryModalTitle').textContent='تعديل إكسسوار';
+  document.getElementById('accessorySaveBtn').textContent='حفظ';
+  openModal('accessoryModalBg');
+}
+function saveAccessory(){
+  const name = document.getElementById('acName').value.trim();
+  if(!name){ alert('الاسم مطلوب'); return; }
+  const data = {
+    name, code:document.getElementById('acCode').value.trim(),
+    unit:document.getElementById('acUnit').value.trim()||'قطعة',
+    price:parseFloat(document.getElementById('acPrice').value)||0,
+    qty:parseFloat(document.getElementById('acQty').value)||0,
+    buy:parseFloat(document.getElementById('acBuy').value)||0,
+    min:parseFloat(document.getElementById('acMin').value)||0
+  };
+  if(editingAccessoryId){
+    const a = state.accessories.find(x=>x.id===editingAccessoryId);
+    if(a) Object.assign(a, data);
+  } else {
+    state.accessories.push({ id:'ac'+Date.now(), ...data });
+  }
+  save(); closeModal('accessoryModalBg'); renderAccessories('');
+}
+function deleteAccessory(id){ state.accessories = state.accessories.filter(a=>a.id!==id); save(); renderAccessories(''); }
+function renderAccessories(filter){
+  let items = state.accessories;
+  if(filter) items = items.filter(a=>(a.name+a.code).toLowerCase().includes(filter.toLowerCase()));
+  const list = document.getElementById('accessoriesList');
+  if(items.length===0){ list.innerHTML = `<div class="empty">لا توجد إكسسوارات<br><button class="btn" onclick="openAccessoryModal()">إضافة</button></div>`; return; }
+  list.innerHTML = items.map(a=>`
+    <div class="item">
+      <div class="top">
+        <div class="icons"><span onclick="deleteAccessory('${a.id}')">🗑</span><span onclick="editAccessory('${a.id}')">✎</span></div>
+        <div style="text-align:left"><span class="name">${esc(a.name)}</span><div class="code">Code: ${esc(a.code||'-')} — ${a.qty||0} ${esc(a.unit)}</div></div>
+      </div>
+      <div class="prices">
+        <div class="box"><div class="k">السعر</div><div class="v blue">${fmt(a.price||0)} د.ت</div></div>
+        <div class="box"><div class="k">سعر الشراء</div><div class="v green">${fmt(a.buy||0)} د.ت</div></div>
+      </div>
+      ${(a.qty||0)<=(a.min||0)?`<div class="unavailable">🛒 مخزون منخفض — الحد الأدنى ${a.min||0}</div>`:''}
+    </div>`).join('');
+}
+
+// ===== CLIENTS =====
+let editingClientId = null;
+function fillClientSelects(){
+  const opts = state.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  ['jobClient','devClient'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = `<option value="">بدون</option>` + opts;
+  });
+}
+function openClientModal(){
+  editingClientId = null;
+  ['clName','clPhone','clAddress','clNotes'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('clientModalTitle').textContent='إضافة حريف';
+  document.getElementById('clientSaveBtn').textContent='إضافة';
+  openModal('clientModalBg');
+}
+function editClient(id){
+  const c = state.clients.find(x=>x.id===id);
+  if(!c) return;
+  editingClientId = id;
+  document.getElementById('clName').value=c.name||'';
+  document.getElementById('clPhone').value=c.phone||'';
+  document.getElementById('clAddress').value=c.address||'';
+  document.getElementById('clNotes').value=c.notes||'';
+  document.getElementById('clientModalTitle').textContent='تعديل حريف';
+  document.getElementById('clientSaveBtn').textContent='حفظ';
+  openModal('clientModalBg');
+}
+function saveClient(){
+  const name = document.getElementById('clName').value.trim();
+  if(!name){ alert('الاسم مطلوب'); return; }
+  const data = { name, phone:document.getElementById('clPhone').value.trim(), address:document.getElementById('clAddress').value.trim(), notes:document.getElementById('clNotes').value.trim() };
+  if(editingClientId){
+    const c = state.clients.find(x=>x.id===editingClientId);
+    if(c) Object.assign(c, data);
+  } else {
+    state.clients.push({ id:'cl'+Date.now(), ...data });
+  }
+  save(); closeModal('clientModalBg'); fillClientSelects(); renderClients('');
+}
+function deleteClient(id){ state.clients = state.clients.filter(c=>c.id!==id); save(); fillClientSelects(); renderClients(''); }
+function renderClients(filter){
+  let items = state.clients;
+  if(filter) items = items.filter(c=>(c.name+c.phone).toLowerCase().includes(filter.toLowerCase()));
+  const list = document.getElementById('clientsList');
+  if(items.length===0){ list.innerHTML = `<div class="empty">لا يوجد حرفاء<br><button class="btn" onclick="openClientModal()">إضافة</button></div>`; return; }
+  list.innerHTML = items.map(c=>`
+    <div class="item">
+      <div class="top">
+        <div class="icons"><span onclick="deleteClient('${c.id}')">🗑</span><span onclick="editClient('${c.id}')">✎</span></div>
+        <div style="text-align:left"><span class="name">${esc(c.name)}</span><div class="code">${esc(c.phone||'-')}</div></div>
+      </div>
+      ${c.address?`<p class="sub" style="margin-top:8px">📍 ${esc(c.address)}</p>`:''}
+      ${c.notes?`<p class="sub" style="margin-top:4px">${esc(c.notes)}</p>`:''}
+    </div>`).join('');
+}
+
+// ===== DEVIS =====
+let devLineCount = 0;
+function fillDevJobSelect(){
+  const el = document.getElementById('devJob');
+  if(el) el.innerHTML = `<option value="">بدون</option>` + state.jobs.map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('');
+}
+function openDevisModal(){
+  fillDevJobSelect(); fillClientSelects();
+  document.getElementById('devLines').innerHTML=''; devLineCount=0;
+  addDevLine(); document.getElementById('devLabor').value=0;
+  updateDevTotals();
+  openModal('devisModalBg');
+}
+function addDevLine(qty, unit, desc){
+  const id = 'dl'+(devLineCount++);
+  const div = document.createElement('div');
+  div.className='lenRow'; div.id=id;
+  div.innerHTML = `
+    <input type="number" placeholder="السعر" value="${qty!==undefined?qty:0}" data-role="price" oninput="updateDevTotals()">
+    <input type="number" placeholder="الكمية" value="${unit!==undefined?unit:1}" data-role="qty" oninput="updateDevTotals()">
+    <input type="text" placeholder="البيان" value="${esc(desc||'')}" data-role="desc" style="grid-column:span 1">
+    <button type="button" class="rm" onclick="document.getElementById('${id}').remove(); updateDevTotals()">✕</button>`;
+  div.style.gridTemplateColumns='1fr 1fr 2fr auto';
+  document.getElementById('devLines').appendChild(div);
+}
+function onDevJobChange(){}
+function updateDevTotals(){
+  let sub = 0;
+  document.querySelectorAll('#devLines .lenRow').forEach(r=>{
+    const p = parseFloat(r.querySelector('[data-role="price"]').value)||0;
+    const q = parseFloat(r.querySelector('[data-role="qty"]').value)||0;
+    sub += p*q;
+  });
+  const labor = parseFloat(document.getElementById('devLabor').value)||0;
+  document.getElementById('devSubtotal').textContent = fmt(sub)+' د.ت';
+  document.getElementById('devLaborShow').textContent = fmt(labor)+' د.ت';
+  document.getElementById('devTotal').textContent = fmt(sub+labor)+' د.ت';
+}
+function saveDevis(){
+  const jobId = document.getElementById('devJob').value;
+  const clientId = document.getElementById('devClient').value;
+  const lines = Array.from(document.querySelectorAll('#devLines .lenRow')).map(r=>({
+    price:parseFloat(r.querySelector('[data-role="price"]').value)||0,
+    qty:parseFloat(r.querySelector('[data-role="qty"]').value)||0,
+    desc:r.querySelector('[data-role="desc"]').value.trim()
+  }));
+  const labor = parseFloat(document.getElementById('devLabor').value)||0;
+  const sub = lines.reduce((s,l)=>s+l.price*l.qty,0);
+  state.devis.push({ id:'dv'+Date.now(), jobId, clientId, lines, labor, total:sub+labor, date:new Date().toISOString().slice(0,10) });
+  save(); closeModal('devisModalBg'); go('devisList');
+}
+function renderDevisList(){
+  const div = document.getElementById('devisListDiv');
+  if(state.devis.length===0){ div.innerHTML = `<div class="empty">لا توجد Devis بعد</div>`; return; }
+  div.innerHTML = state.devis.map(d=>{
+    const client = state.clients.find(c=>c.id===d.clientId);
+    return `<div class="item">
+      <div class="top"><div class="name">${client?esc(client.name):'بدون حريف'}</div><div style="color:var(--gold); font-weight:800">${fmt(d.total)} د.ت</div></div>
+      <p class="sub" style="margin-top:6px">${esc(d.date||'')} — ${d.lines.length} سطر</p>
+    </div>`;
+  }).join('');
+}
+
+// ===== GLOBAL SEARCH =====
+function renderGlobalSearch(q){
+  const box = document.getElementById('globalSearchResults');
+  if(!q){ box.innerHTML=''; return; }
+  const ql = q.toLowerCase();
+  const mats = state.materials.filter(m=>(m.name+m.code).toLowerCase().includes(ql));
+  const accs = state.accessories.filter(a=>(a.name+a.code).toLowerCase().includes(ql));
+  const cls = state.clients.filter(c=>(c.name+c.phone).toLowerCase().includes(ql));
+  const jbs = state.jobs.filter(j=>j.name.toLowerCase().includes(ql));
+  let html='';
+  if(mats.length) html += `<p class="sub">مواد</p>` + mats.map(m=>`<div class="item"><span class="name">${esc(m.name)}</span></div>`).join('');
+  if(accs.length) html += `<p class="sub">إكسسوارات</p>` + accs.map(a=>`<div class="item"><span class="name">${esc(a.name)}</span></div>`).join('');
+  if(cls.length) html += `<p class="sub">حرفاء</p>` + cls.map(c=>`<div class="item"><span class="name">${esc(c.name)}</span></div>`).join('');
+  if(jbs.length) html += `<p class="sub">أعمال</p>` + jbs.map(j=>`<div class="item"><span class="name">${esc(j.name)}</span></div>`).join('');
+  box.innerHTML = html || `<div class="empty">لا توجد نتائج</div>`;
+}
+
+fillClientSelects();
+renderHome();
+</script>
+</body>
+</html>
